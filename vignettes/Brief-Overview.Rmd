@@ -1,0 +1,115 @@
+---
+title: "Brief Overview of the Monte.Carlo.se Package"
+author: "Dennis Boos, Kevin Matthew, Jason Osborne"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Overview of Package Monte.Carlo.se}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, echo=FALSE,eval=FALSE, }
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+The R Package Monte.Carlo.se gives R code that easily produces standard errors for Monte Carlo simulation summaries using either jackknife or bootstrap resampling. (“Monte Carlo” methods essentially refer to any use of random simulation. David (1998) reports that the name was coined by famous mathematician and computer scientist John von Neumann and his Los Alamos colleague S.M. Ulam.)  
+
+The Monte.Carlo.se Package functions and vignettes give many examples, but more details may be found in Boos and Osborne (2015) and Boos and Stefanski (2013, Ch. 9). 
+
+The main functions in this package are
+
+* [mc.se.vector](../help/mc.se.vector)
+* [mc.se.matrix](../help/mc.se.matrix)
+
+They are explained in the vignettes
+
+* [Example 1](Example1.html)
+* [Example 2](Example2.html) 
+
+To fix ideas concretely, we generate 10,000 normal samples of size n=15 (taken from the Example 1 vignette).
+```
+N <- 10000
+set.seed(346)                   # sets the random number seed
+z <- matrix(rnorm(N*15),nrow=N) # N rows of N(0,1) samples, n=15
+```
+Then create vectors of N=10,000 means, 20% trimmed means, and medians computed from these samples,
+```
+out.m.15   <- apply(z,1,mean)             # mean for each sample
+out.t20.15 <- apply(z,1,mean,trim=0.20)   # 20% trimmed mean for each sample
+out.med.15 <- apply(z,1,median)           # median for each sample
+```
+and combine then into a Monte Carlo output matrix X
+```
+> X <- cbind(out.m.15,out.t20.15,out.med.15)
+> dim(X)
+[1] 10000     3
+> X[c(1:4,9997:10000),]
+       out.m.15  out.t20.15  out.med.15
+[1,] -0.2016663 -0.30957261 -0.23881327
+[2,]  0.4069637  0.27808734  0.09589171
+[3,]  0.2799703  0.51686132  0.47694372
+[4,]  0.1133106  0.05632255  0.11780811
+ .        .           .          .
+ .        .           .          .
+ .        .           .          .
+
+[997,] -0.1150505 -0.1225642  -0.38207995
+[998,] -0.2972992 -0.3700191  -0.43463496
+[999,]  0.3470409  0.4545897   0.57967180
+[1000,] 0.4045499  0.4045008  -0.01031273
+```
+X is used to compute Table entries (summaries) and their Monte carlo standard errors.
+Examples of Monte Carlo summaries (= Monte Carlo estimates), often appearing in tables and plots, are 
+
+• the estimated bias and variance of an estimator;   
+• the estimated percentiles of a test statistic or pivotal quantity;   
+• the estimated power function of a hypothesis test;   
+• the estimated mean length and coverage probability of a confidence interval.    
+
+To further clarify statistical language, several definitions are important. Let $Y$ be any random quantity computed from a random sample or process.
+
+the *mean* of a $Y$, denoted $E(Y)=\mu$, is the expected value (or average) of $Y$    
+the *variance* of $Y$ = the expected (or average) value of $\{Y-E(Y)\}^2$    
+the *standard deviation* (SD) = $\sqrt{\mbox{variance}}$ for any random quantity   
+the *standard error* (SE) is an estimate of the SD 
+
+We find that using the above definitions for standard deviation and standard error leads to clarity.
+
+When *Monte Carlo* precedes any of these definitions, like *Monte Carlo SE*, we mean the standard error computed from $N$ independent replicates of random quantities, typically computed from $N$ Monte Carlo simulated samples.  For example, suppose $N$ samples of size $n$ are generated, and the sample median (MD) is computed from each sample, resulting in $MD_1, \ldots, MD_N$, a Monte Carlo sample of sample medians (`out.med.15` created above is an example).
+A Monte Carlo estimate of the bias of the sample median would be 
+\[ \frac{1}{N}\sum_{i=1}^N MD_i - \theta,\]
+where $\theta$ is the population median.  The Monte Calo SE of this bias estimate is simply $s/\sqrt{N}$,
+where $s$ is the sample standard deviation of the $N$ sample medians,
+\[s=\left\{\frac{1}{N-1}\sum_{i=1}^N (MD_i-\overline{MD})^2\right\}^{1/2}. \]
+
+As explained in the summary to Boos and Osborne (2015). 
+ 
+"Good statistical practice dictates that summaries in Monte Carlo studies should always be
+accompanied by standard errors. Those standard errors are easy to provide for summaries that are
+sample means over the replications of the Monte Carlo output: for example, bias estimates, power
+estimates for tests and mean squared error estimates. But often more complex summaries are of
+interest: medians (often displayed in boxplots), sample variances, ratios of sample variances and
+non-normality measures such as skewness and kurtosis. In principle, standard errors for most of
+these latter summaries may be derived from the Delta Method, but that extra step is often a barrier
+for standard errors to be provided."
+
+The purpose of the package is to provide Monte Carlo SEs for both simple and complex summaries from Monte Carlo output.
+
+## References 
+
+Boos, D. D., and  Stefanski, L. A. (2013), *Essential statistical inference: Theory and methods*,
+Springer Science & Business Media.
+
+Boos, D. D., and Osborne, J. A. (2015), "Assessing Variability of Complex Descriptive Statistics in Monte Carlo Studies using Resampling Methods," *International Statistical Review*, 25, 775-792. 
+
+David, H. A. (1998), "First (?) occurrence of common terms in probability and statistics — A
+second list, with corrections"" (Corr: 1998V52 p371), *The American Statistician*, 52:36–40.
+
+
+
+
+
+

@@ -1,0 +1,296 @@
+---
+title: "Creating a Table of Monte Carlo Results with Associated Standard Errrors"
+author: "Dennis Boos, Kevin Matthew, Jason Osborne"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Creating a Table of Monte Carlo Results with Associated Standard Errrors}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, echo=FALSE,eval=FALSE, }
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+In this vignette, we reproduce Table 9.1, p. 367, of Boos and Stefanski (2013), "Essential Statistical Inference." This table summarizes findings from a simulation study of the sampling characteristics of three estimators (the sample mean, a trimmed mean and the sample median) under random sampling with three population distributions and three sample sizes. In particular, the table summarizes Monte Carlo estimation of the variance (times n) of these estimators. The function `mc.se.vector' enables calculation of the Monte Carlo standard error (SE) associated with these variance estimates. The first part of the vignette creates several entries to show the basic code. The second part creates the full table with SEs.
+
+```{r graphics, out.width="680px",echo = FALSE}
+knitr::include_graphics("https://www4.stat.ncsu.edu/~boos/Monte.Carlo.se/table9_1.jpg")
+```
+
+
+
+# 1. Short Version - The Basic Code
+To get started we generate N=10,000 data sets of size n=15 from the normal(0,1) distribution.
+```
+N <- 10000
+set.seed(346)                   # sets the random number seed
+z <- matrix(rnorm(N*15),nrow=N) # N rows of N(0,1) samples, n=15
+```
+Then create vectors of N=10,000 means, 20% trimmed means, and medians computed from samples of size n=15. 
+```
+out.m.15   <- apply(z,1,mean)             # mean for each sample
+out.t20.15 <- apply(z,1,mean,trim=0.20)   # 20% trimmed mean for each sample
+out.med.15 <- apply(z,1,median)           # median for each sample
+```
+Now we use [mc.se.vector](../help/mc.se.vector) to get some of the main table entries and associated jackknife standard errors for `n` times the sample variance of the three estimators (mean, trimmed mean, median) using the R function `varn=function(x,n){n*var(x)}`. Note that `n=15` is an extra parameter to `summary.f=varn`.        
+
+```          
+> mc.se.vector(out.m.15,summary.f=varn,n=15)
+    summary         se     N    method
+1 0.9885314 0.01407249 10000 Jackknife
+
+> mc.se.vector(out.t20.15,summary.f=varn,n=15)
+   summary         se     N    method
+1 1.111288 0.01579671 10000 Jackknife
+
+> mc.se.vector(out.med.15,summary.f=varn,n=15)
+   summary         se     N    method
+1 1.472833 0.02110376 10000 Jackknife
+```
+
+Rounding, we can see that the rounded first entries above, (0.99, 1.11, 1.47), are the first 3 elements in the first row of Table 9.1.
+
+Next we illustrate similar code (adding B= and seed=) to get bootstrap SEs.
+```
+> mc.se.vector(out.m.15,B=1000,seed=583,summary.f=varn,n=15)
+    summary         se     n    method    B seed
+1 0.9885314 0.01444097 10000 Bootstrap 1000  583
+
+> mc.se.vector(out.t20.15,B=1000,seed=264,summary.f=varn,n=15)
+   summary         se     n    method    B seed
+1 1.111288 0.01557149 10000 Bootstrap 1000  264
+
+> mc.se.vector(out.med.15,B=1000,seed=520,summary.f=varn,n=15)
+   summary         se     n    method    B seed
+1 1.472833 0.02208845 10000 Bootstrap 1000  520
+```
+The main table entries ("summary") are identical to the jackknife runs, but the bootstrap SEs are slightly different from the jackknife SEs in the 3rd decimal place.
+
+# 2. Complete Creation of Table 9.1
+
+Here we first generate all of the Monte Carlo output, and then compute all the main entries and SEs of Table 9.1. We start again by generating N=10,000 data sets of size n=15 from the normal(0,1) distribution.
+```
+N <- 10000
+set.seed(346)                    # sets the random number seed
+z <- matrix(rnorm(N*15),nrow=N)  # N rows of N(0,1) samples, n=15
+```
+and create vectors of N=10,000 means, 20% trimmed means, and medians computed from samples of size n=15. 
+```
+out.m.15   <- apply(z,1,mean)             # mean for each sample
+out.t20.15 <- apply(z,1,mean,trim=0.20)   # 20% trimmed mean for each sample
+out.med.15 <- apply(z,1,median)           # median for each sample
+```
+But now we store the estimates in a matrix `raw.out` that will hold all 27 columns of the output.
+```
+raw.out <- matrix(0,nrow=10000,ncol=27)  # to hold all the estimators
+                                     
+raw.out[,1] <- out.m.15
+raw.out[,2] <- out.t20.15
+raw.out[,3] <- out.med.15
+```
+Repeat for n=30
+```
+set.seed(347)
+ z <- matrix(rnorm(N*30),nrow=N)
+ out.m.30   <- apply(z,1,mean)  
+ out.t20.30 <- apply(z,1,mean,trim=0.20)
+ out.med.30 <- apply(z,1,median) 
+
+raw.out[,4] <- out.m.30
+raw.out[,5] <- out.t20.30
+raw.out[,6] <- out.med.30
+```
+and n=120
+```
+set.seed(348)
+ z <- matrix(rnorm(N*120),nrow=N)
+ out.m.120   <- apply(z,1,mean)  
+ out.t20.120 <- apply(z,1,mean,trim=0.20)
+ out.med.120 <- apply(z,1,median) 
+
+raw.out[,7] <- out.m.120
+raw.out[,8] <- out.t20.120
+raw.out[,9] <- out.med.120
+```
+Repeat the above for Laplace and t5 distributions (see [Extra Code](#extra.code) at the end). After running the extra code, we have an N=10,000 by 27 matrix `raw.out` that contains all three estimators for 3 different sample sizes and three different distributions.
+
+Let's compute the main table entries and the jackknife SEs. The next 3 lines of code are just for indexing so that we pull off the right columns from `raw.out` and enter the sample sizes held in `index.n`.
+```
+entry.table9.1 <- matrix(0,nrow=3,ncol=9)
+se.table9.1    <- matrix(0,nrow=3,ncol=9)
+index.m        <- c(1:3,10:12,19:21,4:6,13:15,22:24,7:9,16:18,25:27)
+index.n        <- c(rep(15,9),rep(30,9),rep(120,9))
+```
+We use [mc.se.vector](../help/mc.se.vector) to get the jackknife standard errors for `n` times the sample
+variance of the three estimators (mean, trimmed mean, median) using the R function
+`varn=function(x,n){n*var(x)}`. Note that `n=` is an extra parameter to `summary.f=varn`.
+The main entries in Table 9.1 are also returned by `mc.se.vector`.
+```
+for(i in 1:9){
+    out <- mc.se.vector(raw.out[,index.m[i]],summary.f=varn,n=index.n[i])
+    entry.table9.1[1,i] <- out$summary
+    se.table9.1[1,i] <- out$se
+    }
+for(i in 1:9){
+    out <- mc.se.vector(raw.out[,index.m[i+9]],summary.f=varn,n=index.n[i+9])
+    entry.table9.1[2,i] <- out$summary
+    se.table9.1[2,i] <- out$se
+    }
+for(i in 1:9){
+    out <- mc.se.vector(raw.out[,index.m[i+18]],summary.f=varn,n=index.n[i+18])
+    entry.table9.1[3,i] <- out$summary
+    se.table9.1[3,i] <- out$se
+    }
+table.9.1 <- data.frame(round(entry.table9.1,2))
+table.9.1.jackknife.se <- data.frame(round(se.table9.1,3))
+names(table.9.1) <- c("n.m","n.t20","n.med","l.m","l.t20","l.med","t.m","t.t20","t.med")
+row.names(table.9.1) <- c("n=15","n=30","n=120")
+names(table.9.1.jackknife.se) <-  c("n.m","n.t20","n.med","l.m","l.t20","l.med","t.m","t.t20","t.med")
+row.names(table.9.1.jackknife.se) <- c("n=15","n=30","n=120")
+```
+The results are
+```
+> table.9.1
+       n.m n.t20 n.med  l.m l.t20 l.med  t.m t.t20 t.med
+n=15  0.99  1.11  1.47 1.00  0.70  0.71 1.02  0.85  1.06
+n=30  1.02  1.16  1.53 0.99  0.67  0.64 1.00  0.81  1.00
+n=120 1.01  1.15  1.57 0.99  0.65  0.57 1.00  0.83  1.05
+
+> table.9.1.jackknife.se
+        n.m n.t20 n.med   l.m l.t20 l.med   t.m t.t20 t.med
+n=15  0.014 0.016 0.021 0.015 0.011 0.012 0.015 0.012 0.016
+n=30  0.015 0.016 0.022 0.015 0.010 0.010 0.015 0.012 0.014
+n=120 0.014 0.017 0.023 0.014 0.009 0.009 0.014 0.012 0.015
+```
+We recommend reporting only a summary of these standard errors in the table footnote.
+For example, we used the range 0.01 to 0.02 in the Note at the bottom of Table 9.1 based on
+```
+> range(table.9.1.jackknife.se)
+ [1] 0.009 0.023
+```
+But we might have reported the average SE from
+```
+> mean(as.matrix(table.9.1.jackknife.se))
+ [1] 0.01437037
+```
+Next we repeat the above steps, but adding `B` and `seed`, to get bootstrap SEs.
+```
+se.Boot <- matrix(0,nrow=3,ncol=9)
+index.m <- c(1:3,10:12,19:21,4:6,13:15,22:24,7:9,16:18,25:27)
+index.n <- c(rep(15,9),rep(30,9),rep(120,9))
+
+set.seed(3928)
+iseed <- sample(1:1000,9)
+for(i in 1:9){se.Boot[1,i] <- mc.se.vector(raw.out[,index.m[i]],
+              summary.f=varn,B=1000,seed=iseed[i],n=index.n[i])$se}
+for(i in 1:9){se.Boot[2,i] <- mc.se.vector(raw.out[,index.m[i+9]],
+              summary.f=varn,B=1000,seed=iseed[i]+50,n=index.n[i+9])$se}
+for(i in 1:9){se.Boot[3,i] <- mc.se.vector(raw.out[,index.m[i+18]],
+              summary.f=varn,B=1000,seed=iseed[i]+100,n=index.n[i+18])$se}
+
+table.9.1.bootstrap.se <- data.frame(round(se.Boot,3))
+names(table.9.1.bootstrap.se) <- c("n.m","n.t20","n.med","l.m","l.t20","l.med","t.m","t.t20","t.med")
+row.names(table.9.1.bootstrap.se) <- c("n=15","n=30","n=120")
+```
+The results are very similar to the jackknife:
+```
+> table.9.1.bootstrap.se
+        n.m n.t20 n.med   l.m l.t20 l.med   t.m t.t20 t.med
+n=15  0.014 0.016 0.021 0.015 0.011 0.013 0.016 0.013 0.016
+n=30  0.015 0.017 0.022 0.015 0.010 0.010 0.015 0.012 0.014
+n=120 0.014 0.016 0.022 0.014 0.009 0.009 0.014 0.012 0.015
+
+> range(table.9.1.bootstrap.se)
+[1] 0.009 0.022
+> mean(as.matrix(table.9.1.bootstrap.se))
+[1] 0.01444444
+```
+
+# Extra Code {#extra.code}
+
+The following code fills out the other 18 columns of `raw.out`.
+                 
+```
+# Generate Laplace data sets
+N <- 10000
+set.seed(350)                    # sets the random number seed
+ z1 <- matrix(rexp(N*15),nrow=N)
+ z2 <- matrix(rexp(N*15),nrow=N)
+ z<-(z1-z2)/sqrt(2)              # subtract standard exponentials
+ out.m.15   <- apply(z,1,mean)            
+ out.t20.15 <- apply(z,1,mean,trim=0.20)   
+ out.med.15 <- apply(z,1,median)        
+
+raw.out[,10]=out.m.15
+raw.out[,11]=out.t20.15
+raw.out[,12]=out.med.15
+
+set.seed(351)
+ z1 <- matrix(rexp(N*30),nrow=N)
+ z2 <- matrix(rexp(N*30),nrow=N)
+ z<-(z1-z2)/sqrt(2)              
+ out.m.30   <- apply(z,1,mean)            
+ out.t20.30 <- apply(z,1,mean,trim=0.20)   
+ out.med.30 <- apply(z,1,median)        
+
+raw.out[,13] <- out.m.30
+raw.out[,14] <- out.t20.30
+raw.out[,15] <- out.med.30
+
+set.seed(352)
+ z1 <- matrix(rexp(N*120),nrow=N)
+ z2 <- matrix(rexp(N*120),nrow=N)
+ z<-(z1-z2)/sqrt(2)              
+ out.m.120   <- apply(z,1,mean)            
+ out.t20.120 <- apply(z,1,mean,trim=0.20)   
+ out.med.120 <- apply(z,1,median)        
+
+raw.out[,16] <- out.m.120
+raw.out[,17] <- out.t20.120
+raw.out[,18] <- out.med.120
+
+laplace.15 <- data.frame(mean=15*var(out.m.15),trim20=15*var(out.t20.15),median=15*var(out.med.15))
+laplace.30 <- data.frame(mean=30*var(out.m.30),trim20=30*var(out.t20.30),median=30*var(out.med.30))
+laplace.120 <- data.frame(mean=120*var(out.m.120),trim20=120*var(out.t20.120),median=120*var(out.med.120))
+
+# Generate t(df=5) data sets
+N <- 10000
+ set.seed(360)                                # sets the random number seed
+ z <- matrix(rt(N*15,df=5)/sqrt(5/3),nrow=N)  # N rows of t5 standardized RVs
+ out.m.15   <- apply(z,1,mean)  
+ out.t20.15 <- apply(z,1,mean,trim=0.20)
+ out.med.15 <- apply(z,1,median)  
+
+raw.out[,19] <- out.m.15
+raw.out[,20] <- out.t20.15
+raw.out[,21] <- out.med.15
+
+set.seed(361)
+ z <- matrix(rt(N*30,df=5)/sqrt(5/3),nrow=N) 
+ out.m.30   <- apply(z,1,mean)  
+ out.t20.30 <- apply(z,1,mean,trim=0.20)
+ out.med.30 <- apply(z,1,median)  
+
+raw.out[,22] <- out.m.30
+raw.out[,23] <- out.t20.30
+raw.out[,24] <- out.med.30
+
+set.seed(362)
+ z <- matrix(rt(N*120,df=5)/sqrt(5/3),nrow=N) 
+ out.m.120   <- apply(z,1,mean)  
+ out.t20.120 <- apply(z,1,mean,trim=0.20)
+ out.med.120 <- apply(z,1,median)  
+
+raw.out[,25] <- out.m.120
+raw.out[,26] <- out.t20.120
+raw.out[,27] <- out.med.120
+
+t5.15 <- data.frame(mean=15*var(out.m.15),trim20=15*var(out.t20.15),median=15*var(out.med.15))
+t5.30 <- data.frame(mean=30*var(out.m.30),trim20=30*var(out.t20.30),median=30*var(out.med.30))
+t5.120 <- data.frame(mean=120*var(out.m.120),trim20=120*var(out.t20.120),median=120*var(out.med.120))
+```
+
