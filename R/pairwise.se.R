@@ -27,15 +27,17 @@
 #' The vignette \code{vignette("Example3", package = "Monte.Carlo.se")} 
 #' is a detailed account of using \code{pairwise.se}.
 #'
+#' @importFrom stats var sd cor
+#'
 #' @examples
 #' \donttest{
 #' # Using the output data matrix hold generated in vignette Example3, 
 #' # calculate jackknife and bootstrap standard errors
 #' # for the differences and ratios of the CV estimates.
-#' 
+#'
 #' # Jackknife SE of Differences of CVs
 #' 
-#' pairwise.se(hold,xcol=10:12,summary.f=cv)
+#' # pairwise.se(hold,xcol=10:12,summary.f=cv)
 #' # elem  summi  summj summary     se  t.stat    N    method
 #' # 1 10 11 0.6884 0.7030 -0.0146 0.0299 -0.4877 1000 Jackknife
 #' # 2 10 12 0.6884 0.6489  0.0395 0.0195  2.0274 1000 Jackknife
@@ -43,7 +45,7 @@
 #' 
 #' # Jackknife SE of Ratios of CVs
 #' 
-#' pairwise.se(hold,xcol=10:12,diff=F,summary.f=cv)
+#' # pairwise.se(hold,xcol=10:12,diff=FALSE,summary.f=cv)
 #' # elem  summi  summj summary     se  t.stat    N    method
 #' # 1 10 11 0.6884 0.7030  0.9792 0.0429 -0.4833 1000 Jackknife
 #' # 2 10 12 0.6884 0.6489  1.0608 0.0321  1.8972 1000 Jackknife
@@ -51,7 +53,7 @@
 #' 
 #' # Bootstrap SE of Differences of CVs
 #' 
-#' pairwise.se(hold,xcol=10:12,B=1000,seed=770,summary.f=cv)
+#' # pairwise.se(hold,xcol=10:12,B=1000,seed=770,summary.f=cv)
 #' # elem  summi  summj summary     se  t.stat    B seed    N    method
 #' # 1 10 11 0.6884 0.7030 -0.0146 0.0278 -0.5250 1000  770 1000 Bootstrap
 #' # 2 10 12 0.6884 0.6489  0.0395 0.0182  2.1671 1000  770 1000 Bootstrap
@@ -59,12 +61,18 @@
 #' 
 #' # Bootstrap SE of Ratios of CVs
 #' 
-#' pairwise.se(hold,xcol=10:12,diff=F,B=1000,seed=770,summary.f=cv)
+#' # pairwise.se(hold,xcol=10:12,diff=FALSE,B=1000,seed=770,summary.f=cv)
 #' # elem  summi  summj summary     se  t.stat    B seed    N    method
 #' # 1 10 11 0.6884 0.7030  0.9792 0.0390 -0.5316 1000  770 1000 Bootstrap
 #' # 2 10 12 0.6884 0.6489  1.0608 0.0292  2.0797 1000  770 1000 Bootstrap
 #' # 3 11 12 0.7030 0.6489  1.0833 0.0430  1.9372 1000  770 1000 Bootstrap
 #' }
+#' 
+#' @references 
+#' Boos, D. D., and Osborne, J. A. (2015), "Assessing Variability of Complex Descriptive
+#' Statistics in Monte Carlo Studies using Resampling Methods," 
+#' International Statistical Review, 25, 775-792.
+#'
 #' @author Dennis Boos, Kevin Matthew, Jason Osborne
 #'
 #' @export

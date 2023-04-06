@@ -9,6 +9,8 @@
 #'
 #' @return Returns the bootstrap SE of theta(x)
 #'
+#' @importFrom stats var sd cor
+#'
 #' @examples
 #' \donttest{
 #' # simple example, data from Boos and Osborne (2105, Table 3)

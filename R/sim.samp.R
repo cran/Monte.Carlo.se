@@ -11,6 +11,8 @@
 #'
 #' @author Dennis Boos, Kevin Matthew, Jason Osborne 
 #'
+#' @importFrom stats var sd cor
+#'
 #' @examples
 #' N<-100
 #'  set.seed(346)            # sets the random number seed

@@ -18,6 +18,8 @@
 #' \code{mc.se.vector} gives Monte Carlo standard errors (SEs) for these summary statistics.
 #' The vignette \code{vignette("Example1", package = "Monte.Carlo.se")} is a detailed account of using \code{mc.se.vector}.
 #'
+#' @importFrom stats var sd cor
+#'
 #' @examples
 #' \donttest{
 #' # First create MC output used for Table 9.1, p. 367, of Boos and Stefanski (2013)

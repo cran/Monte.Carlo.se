@@ -8,6 +8,8 @@
 #'
 #' @return Returns the jackknife standard error of theta(x)
 #'
+#' @importFrom stats var sd cor
+#'
 #' @examples
 #' \donttest{
 #' # simple example, data from Boos and Osborne (2015, Table 3)

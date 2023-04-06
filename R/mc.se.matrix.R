@@ -19,6 +19,8 @@
 #' \code{vignette("Example2", package = "Monte.Carlo.se")} is a detailed 
 #' account of using mc.se.vector.
 #' 
+#' @importFrom stats var sd cor
+#'
 #' @examples
 #' \donttest{
 #' # First create MC output used in Table 9.1, p. 367, of Boos and Stefanski (2013).

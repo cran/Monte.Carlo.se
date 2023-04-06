@@ -13,6 +13,8 @@
 #' @param true true parameter value when computing mean squared error
 #' @param n sample size
 #'
+#' @importFrom stats var sd cor
+#'
 #' @examples
 #' # These are extra functions included in the MCse package
 #' # The following functions are to be used with mc.se.matrix

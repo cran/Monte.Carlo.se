@@ -1,20 +1,44 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Dennis Boos, Kevin Matthew, Jason Osborne" />
 
-<meta name="date" content="2019-05-01" />
+<meta name="date" content="2023-04-05" />
 
 <title>Brief Overview of the Monte.Carlo.se Package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
 
 
 
@@ -31,9 +55,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -202,7 +223,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -215,14 +237,22 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<h1 class="title toc-ignore">Brief Overview of the Monte.Carlo.se Package</h1>
+<h1 class="title toc-ignore">Brief Overview of the Monte.Carlo.se
+Package</h1>
 <h4 class="author">Dennis Boos, Kevin Matthew, Jason Osborne</h4>
-<h4 class="date">2019-05-01</h4>
+<h4 class="date">2023-04-05</h4>
 
 
 
-<p>The R Package Monte.Carlo.se gives R code that easily produces standard errors for Monte Carlo simulation summaries using either jackknife or bootstrap resampling. (“Monte Carlo” methods essentially refer to any use of random simulation. David (1998) reports that the name was coined by famous mathematician and computer scientist John von Neumann and his Los Alamos colleague S.M. Ulam.)</p>
-<p>The Monte.Carlo.se Package functions and vignettes give many examples, but more details may be found in Boos and Osborne (2015) and Boos and Stefanski (2013, Ch. 9).</p>
+<p>The R Package Monte.Carlo.se gives R code that easily produces
+standard errors for Monte Carlo simulation summaries using either
+jackknife or bootstrap resampling. (“Monte Carlo” methods essentially
+refer to any use of random simulation. David (1998) reports that the
+name was coined by famous mathematician and computer scientist John von
+Neumann and his Los Alamos colleague S.M. Ulam.)</p>
+<p>The Monte.Carlo.se Package functions and vignettes give many
+examples, but more details may be found in Boos and Osborne (2015) and
+Boos and Stefanski (2013, Ch. 9).</p>
 <p>The main functions in this package are</p>
 <ul>
 <li><a href="../help/mc.se.vector">mc.se.vector</a></li>
@@ -233,11 +263,13 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <li><a href="Example1.html">Example 1</a></li>
 <li><a href="Example2.html">Example 2</a></li>
 </ul>
-<p>To fix ideas concretely, we generate 10,000 normal samples of size n=15 (taken from the Example 1 vignette).</p>
+<p>To fix ideas concretely, we generate 10,000 normal samples of size
+n=15 (taken from the Example 1 vignette).</p>
 <pre><code>N &lt;- 10000
 set.seed(346)                   # sets the random number seed
 z &lt;- matrix(rnorm(N*15),nrow=N) # N rows of N(0,1) samples, n=15</code></pre>
-<p>Then create vectors of N=10,000 means, 20% trimmed means, and medians computed from these samples,</p>
+<p>Then create vectors of N=10,000 means, 20% trimmed means, and medians
+computed from these samples,</p>
 <pre><code>out.m.15   &lt;- apply(z,1,mean)             # mean for each sample
 out.t20.15 &lt;- apply(z,1,mean,trim=0.20)   # 20% trimmed mean for each sample
 out.med.15 &lt;- apply(z,1,median)           # median for each sample</code></pre>
@@ -259,28 +291,70 @@ out.med.15 &lt;- apply(z,1,median)           # median for each sample</code></pr
 [998,] -0.2972992 -0.3700191  -0.43463496
 [999,]  0.3470409  0.4545897   0.57967180
 [1000,] 0.4045499  0.4045008  -0.01031273</code></pre>
-<p>X is used to compute Table entries (summaries) and their Monte carlo standard errors. Examples of Monte Carlo summaries (= Monte Carlo estimates), often appearing in tables and plots, are</p>
+<p>X is used to compute Table entries (summaries) and their Monte carlo
+standard errors. Examples of Monte Carlo summaries (= Monte Carlo
+estimates), often appearing in tables and plots, are</p>
 <p>• the estimated bias and variance of an estimator;<br />
-• the estimated percentiles of a test statistic or pivotal quantity;<br />
+• the estimated percentiles of a test statistic or pivotal
+quantity;<br />
 • the estimated power function of a hypothesis test;<br />
-• the estimated mean length and coverage probability of a confidence interval.</p>
-<p>To further clarify statistical language, several definitions are important. Let <span class="math inline">\(Y\)</span> be any random quantity computed from a random sample or process.</p>
-<p>the <em>mean</em> of a <span class="math inline">\(Y\)</span>, denoted <span class="math inline">\(E(Y)=\mu\)</span>, is the expected value (or average) of <span class="math inline">\(Y\)</span><br />
-the <em>variance</em> of <span class="math inline">\(Y\)</span> = the expected (or average) value of <span class="math inline">\(\{Y-E(Y)\}^2\)</span><br />
-the <em>standard deviation</em> (SD) = <span class="math inline">\(\sqrt{\mbox{variance}}\)</span> for any random quantity<br />
+• the estimated mean length and coverage probability of a confidence
+interval.</p>
+<p>To further clarify statistical language, several definitions are
+important. Let <span class="math inline">\(Y\)</span> be any random
+quantity computed from a random sample or process.</p>
+<p>the <em>mean</em> of a <span class="math inline">\(Y\)</span>,
+denoted <span class="math inline">\(E(Y)=\mu\)</span>, is the expected
+value (or average) of <span class="math inline">\(Y\)</span><br />
+the <em>variance</em> of <span class="math inline">\(Y\)</span> = the
+expected (or average) value of <span class="math inline">\(\{Y-E(Y)\}^2\)</span><br />
+the <em>standard deviation</em> (SD) = <span class="math inline">\(\sqrt{\mbox{variance}}\)</span> for any random
+quantity<br />
 the <em>standard error</em> (SE) is an estimate of the SD</p>
-<p>We find that using the above definitions for standard deviation and standard error leads to clarity.</p>
-<p>When <em>Monte Carlo</em> precedes any of these definitions, like <em>Monte Carlo SE</em>, we mean the standard error computed from <span class="math inline">\(N\)</span> independent replicates of random quantities, typically computed from <span class="math inline">\(N\)</span> Monte Carlo simulated samples. For example, suppose <span class="math inline">\(N\)</span> samples of size <span class="math inline">\(n\)</span> are generated, and the sample median (MD) is computed from each sample, resulting in <span class="math inline">\(MD_1, \ldots, MD_N\)</span>, a Monte Carlo sample of sample medians (<code>out.med.15</code> created above is an example). A Monte Carlo estimate of the bias of the sample median would be <span class="math display">\[ \frac{1}{N}\sum_{i=1}^N MD_i - \theta,\]</span> where <span class="math inline">\(\theta\)</span> is the population median. The Monte Calo SE of this bias estimate is simply <span class="math inline">\(s/\sqrt{N}\)</span>, where <span class="math inline">\(s\)</span> is the sample standard deviation of the <span class="math inline">\(N\)</span> sample medians, <span class="math display">\[s=\left\{\frac{1}{N-1}\sum_{i=1}^N (MD_i-\overline{MD})^2\right\}^{1/2}. \]</span></p>
+<p>We find that using the above definitions for standard deviation and
+standard error leads to clarity.</p>
+<p>When <em>Monte Carlo</em> precedes any of these definitions, like
+<em>Monte Carlo SE</em>, we mean the standard error computed from <span class="math inline">\(N\)</span> independent replicates of random
+quantities, typically computed from <span class="math inline">\(N\)</span> Monte Carlo simulated samples. For
+example, suppose <span class="math inline">\(N\)</span> samples of size
+<span class="math inline">\(n\)</span> are generated, and the sample
+median (MD) is computed from each sample, resulting in <span class="math inline">\(MD_1, \ldots, MD_N\)</span>, a Monte Carlo sample
+of sample medians (<code>out.med.15</code> created above is an example).
+A Monte Carlo estimate of the bias of the sample median would be <span class="math display">\[ \frac{1}{N}\sum_{i=1}^N MD_i - \theta,\]</span>
+where <span class="math inline">\(\theta\)</span> is the population
+median. The Monte Calo SE of this bias estimate is simply <span class="math inline">\(s/\sqrt{N}\)</span>, where <span class="math inline">\(s\)</span> is the sample standard deviation of the
+<span class="math inline">\(N\)</span> sample medians, <span class="math display">\[s=\left\{\frac{1}{N-1}\sum_{i=1}^N
+(MD_i-\overline{MD})^2\right\}^{1/2}. \]</span></p>
 <p>As explained in the summary to Boos and Osborne (2015).</p>
-<p>“Good statistical practice dictates that summaries in Monte Carlo studies should always be accompanied by standard errors. Those standard errors are easy to provide for summaries that are sample means over the replications of the Monte Carlo output: for example, bias estimates, power estimates for tests and mean squared error estimates. But often more complex summaries are of interest: medians (often displayed in boxplots), sample variances, ratios of sample variances and non-normality measures such as skewness and kurtosis. In principle, standard errors for most of these latter summaries may be derived from the Delta Method, but that extra step is often a barrier for standard errors to be provided.”</p>
-<p>The purpose of the package is to provide Monte Carlo SEs for both simple and complex summaries from Monte Carlo output.</p>
+<p>“Good statistical practice dictates that summaries in Monte Carlo
+studies should always be accompanied by standard errors. Those standard
+errors are easy to provide for summaries that are sample means over the
+replications of the Monte Carlo output: for example, bias estimates,
+power estimates for tests and mean squared error estimates. But often
+more complex summaries are of interest: medians (often displayed in
+boxplots), sample variances, ratios of sample variances and
+non-normality measures such as skewness and kurtosis. In principle,
+standard errors for most of these latter summaries may be derived from
+the Delta Method, but that extra step is often a barrier for standard
+errors to be provided.”</p>
+<p>The purpose of the package is to provide Monte Carlo SEs for both
+simple and complex summaries from Monte Carlo output.</p>
 <div id="references" class="section level2">
 <h2>References</h2>
-<p>Boos, D. D., and Stefanski, L. A. (2013), <em>Essential statistical inference: Theory and methods</em>, Springer Science &amp; Business Media.</p>
-<p>Boos, D. D., and Osborne, J. A. (2015), “Assessing Variability of Complex Descriptive Statistics in Monte Carlo Studies using Resampling Methods,” <em>International Statistical Review</em>, 25, 775-792.</p>
-<p>David, H. A. (1998), “First (?) occurrence of common terms in probability and statistics — A second list, with corrections”&quot; (Corr: 1998V52 p371), <em>The American Statistician</em>, 52:36–40.</p>
+<p>Boos, D. D., and Stefanski, L. A. (2013), <em>Essential statistical
+inference: Theory and methods</em>, Springer Science &amp; Business
+Media.</p>
+<p>Boos, D. D., and Osborne, J. A. (2015), “Assessing Variability of
+Complex Descriptive Statistics in Monte Carlo Studies using Resampling
+Methods,” <em>International Statistical Review</em>, 25, 775-792.</p>
+<p>David, H. A. (1998), “First (?) occurrence of common terms in
+probability and statistics — A second list, with corrections”” (Corr:
+1998V52 p371), <em>The American Statistician</em>, 52:36–40.</p>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
